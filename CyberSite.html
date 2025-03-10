@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Abhishek Diwate|</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Core Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #0a0a14;
+            color: #e0e0e0;
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            padding-top: 70px;
+        }
+
+        /* Binary Blocks (Bidirectional Movement) */
+        .binary-blocks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -3;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .binary-blocks span {
+            position: absolute;
+            color: #66cc99;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+            opacity: 0.2;
+            white-space: nowrap;
+            animation: moveBlocks linear infinite;
+            will-change: transform;
+        }
+
+        @keyframes moveBlocks {
+            0% { transform: translateX(var(--startX)); }
+            100% { transform: translateX(var(--endX)); }
+        }
+
+        /* Binary Rain (Reduced on Mobile) */
+        .binary-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .binary-rain span {
+            position: absolute;
+            color: #66cc99;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            opacity: 0.4;
+            animation: binaryFall linear infinite;
+            will-change: transform;
+        }
+
+        @keyframes binaryFall {
+            0% { transform: translateY(var(--startY)); opacity: 0.4; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+
+        /* Neural Network Canvas */
+        .neural-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            opacity: 0.15;
+        }
+
+        /* Header with Hamburger on Extreme Right */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 20, 0.95);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            padding: 0.5rem 0;
+            height: 70px;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            gap: 20px;
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: #00b7eb;
+            background: linear-gradient(to right, #1a2a44, #2e4057);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .hamburger {
+            font-size: 1.5rem;
+            color: #66cc99;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            position: static;
+        }
+
+        .hamburger:hover {
+            transform: scale(1.1);
+        }
+
+        /* Toggle Menu with Sections (Sliding from Right) */
+        .menu-toggle {
+            display: block;
+            position: fixed;
+            top: 0;
+            right: -250px;
+            width: 250px;
+            height: 100%;
+            background: rgba(10, 10, 20, 0.95);
+            padding: 2rem;
+            box-shadow: -2px 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            transition: right 0.3s ease;
+        }
+
+        .menu-toggle.active {
+            right: 0;
+        }
+
+        .menu-toggle .close-btn {
+            font-size: 1.5rem;
+            color: #e0e0e0;
+            cursor: pointer;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .menu-toggle .close-btn:hover {
+            color: #ff3399;
+        }
+
+        .menu-toggle ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .menu-toggle ul li a {
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .menu-toggle ul li a:hover {
+            color: #66cc99;
+        }
+
+        /* General Section with Animations */
+        .section {
+            padding: 4rem 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            opacity: 0;
+        }
+
+        #hero { animation: zoomIn 1s ease forwards; }
+        #about { animation: slideFromLeft 1s ease forwards; }
+        #projects { animation: slideFromRight 1s ease forwards; }
+        #experience { animation: fadeInUp 1s ease forwards; }
+        #education { animation: fadeInUp 1s ease forwards; }
+        #certifications { animation: rotateIn 1s ease forwards; }
+        #achievements { animation: fadeInUp 1s ease forwards; }
+        #volunteer { animation: fadeInUp 1s ease forwards; }
+        #contact { animation: bounceIn 1s ease forwards; }
+
+        @keyframes zoomIn {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideFromLeft {
+            0% { opacity: 0; transform: translateX(-100px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideFromRight {
+            0% { opacity: 0; transform: translateX(100px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(50px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes rotateIn {
+            0% { opacity: 0; transform: rotate(-10deg); }
+            100% { opacity: 1; transform: rotate(0); }
+        }
+
+        @keyframes bounceIn {
+            0% { opacity: 0; transform: scale(0.9); }
+            50% { transform: scale(1.05); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .section h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: #66cc99;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Hero Section */
+        .hero-content {
+            max-width: 800px;
+            padding: 2rem;
+            background: rgba(10, 10, 20, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        #hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            color: #66cc99;
+            margin-bottom: 1rem;
+        }
+
+        #hero .tagline {
+            font-size: 1.5rem;
+            color: #66cc99;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: #66cc99;
+            color: #0a0a14;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #ff3399;
+            transform: scale(1.05);
+        }
+
+        /* About Section */
+        #about .skills {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        #about p {
+            max-width: 100%;
+            word-wrap: break-word;
+            padding: 0 1rem;
+        }
+
+        .skill-card {
+            background: rgba(20, 20, 40, 0.9);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #66cc99;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 5px 15px rgba(102, 204, 153, 0.3);
+        }
+
+        /* Projects Section */
+        #projects .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .project-card {
+            background: rgba(20, 20, 40, 0.9);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid #ff3399;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .project-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 5px 15px rgba(255, 51, 153, 0.3);
+        }
+
+        .project-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #66cc99;
+            margin-bottom: 1rem;
+        }
+
+        .project-card a {
+            color: #66cc99;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .project-card a:hover {
+            color: #ff3399;
+        }
+
+        /* Experience Section */
+        .experience-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .experience-card {
+            background: rgba(20, 20, 40, 0.9);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid #66cc99;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .experience-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 5px 15px rgba(102, 204, 153, 0.3);
+        }
+
+        /* Certifications Section */
+        .cert-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem;
+        }
+
+        .cert-card {
+            background: rgba(20, 20, 40, 0.9);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #ff3399;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cert-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 51, 153, 0.3);
+        }
+
+        .cert-card a {
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .cert-card a:hover {
+            color: #ff3399;
+        }
+
+        /* Contact Section */
+        #contact form {
+            max-width: 500px;
+            margin: 0 auto 2rem;
+            padding: 1.5rem;
+            background: rgba(20, 20, 40, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        #contact input, #contact textarea {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            background: #141428;
+            border: 1px solid #66cc99;
+            border-radius: 5px;
+            color: #e0e0e0;
+            font-size: 1rem;
+        }
+
+        #contact input:focus, #contact textarea:focus {
+            border-color: #ff3399;
+            outline: none;
+        }
+
+        .social-links {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            margin: 0 1rem;
+            color: #66cc99;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: #ff3399;
+        }
+
+        /* AI Assistant */
+        .ai-assistant {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: #66cc99;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0a0a14;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(102, 204, 153, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .ai-assistant:hover {
+            transform: scale(1.1);
+        }
+
+        .ai-panel {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 250px;
+            background: rgba(20, 20, 40, 0.95);
+            border-radius: 10px;
+            padding: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            display: none;
+            animation: slideIn 0.5s ease forwards;
+        }
+
+        .ai-panel.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            0% { opacity: 0; transform: translateY(50px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body { padding-top: 70px; }
+            #hero h1 { font-size: 1.8rem; }
+            .section h2 { font-size: 1.6rem; }
+            .btn { padding: 0.6rem 1.2rem; font-size: 0.8rem; }
+            .project-grid, .skills, .cert-grid { grid-template-columns: 1fr; }
+            .header-container { text-align: center; }
+            .hero-content { padding: 1rem; max-width: 90%; margin: 0 auto; }
+            .section { padding: 1.5rem 0.5rem; margin-top: 70px; }
+            .binary-rain span { font-size: 0.8rem; }
+            #about p { font-size: 0.9rem; padding: 0 0.5rem; }
+        }
+
+        @media (max-width: 480px) {
+            .logo { font-size: 1.5rem; }
+            .hero-content { padding: 0.8rem; }
+            .section { padding: 1rem 0.3rem; }
+            .project-card, .skill-card, .cert-card { padding: 1rem; }
+            #contact form { max-width: 100%; padding: 1rem; }
+            .menu-toggle { width: 200px; }
+            .binary-density { binaryDensity = 80; }
+            #about p { font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="binary-blocks" id="binary-blocks"></div>
+    <div class="binary-rain" id="binary-rain"></div>
+    <div class="neural-canvas"><canvas id="neural-canvas"></canvas></div>
+    <header>
+        <div class="header-container">
+            <div class="logo">Abhishek Diwate</div>
+            <i class="fas fa-bars hamburger" id="hamburger"></i>
+            <div class="menu-toggle" id="menu-toggle">
+                <i class="fas fa-times close-btn" id="close-btn"></i>
+                <ul>
+                    <li><a href="#hero">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#projects">Projects</a></li>
+                    <li><a href="#experience">Experience</a></li>
+                    <li><a href="#education">Education</a></li>
+                    <li><a href="#certifications">Certification</a></li>
+                    <li><a href="#achievements">Achievements</a></li>
+                    <li><a href="#volunteer">Volunteer Experience</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero" class="section">
+        <div class="hero-content">
+            <h1>Abhishek Diwate</h1>
+            <p class="tagline">Cybersecurity Analyst | SOC | Cloud Security</p>
+            <p class="intro">Securing the digital frontier with expertise and innovation.</p>
+            <!-- Replace href with actual resume PDF URL -->
+            <a href="Abhishek-Diwate-Resume.pdf" class="btn" download>Download Resume</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <h2>About Me</h2>
+        <p>Motivated cybersecurity enthusiast with a B.Tech in Electronics & Communications and hands-on experience in threat monitoring, OSINT research, and SIEM tools (Splunk). Proficient in Python automation, and frameworks like MITRE ATT&CK and Cyber Kill Chain. Collaborates with cross-functional teams, adapting to evolving cyber threats.</p>
+        <div class="skills">
+            <div class="skill-card">SIEM</div>
+            <div class="skill-card">Networking</div>
+            <div class="skill-card">Python</div>
+            <div class="skill-card">Firewalls</div>
+            <div class="skill-card">Incident Response</div>
+            <div class="skill-card">Threat Hunting</div>
+            <div class="skill-card">AWS (IAM)</div>
+            <div class="skill-card">OWASP 10</div>
+			<div class="skill-card">Security Frameworks</div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section">
+        <h2>Projects</h2>
+        <div class="project-grid">
+            <div class="project-card">
+                <h3>Automated Incident Response System</h3>
+                <p>Developed a Python-based tool integrated with Splunk to automate IOC detection log entries, mapping threats to MITRE ATT&CK.</p>
+                <a href="https://colab.research.google.com/drive/1Tf2VMjCYKxHiJ3gsMAb9HPb5mMji9wuh">Link</a>
+            </div>
+            <div class="project-card">
+                <h3>Threat Detector using Web Scrap</h3>
+                <p>Developed a web scraping module to collect data about emerging threats from forums and social media.</p>
+                <a href="https://colab.research.google.com/drive/1KKYAVTBjsK_9NBtkb_BTk_ycwn-3_Tg0">Link</a>
+            </div>
+            <div class="project-card">
+                <h3>Bitcoin Price Prediction & Secure Website</h3>
+                <p>Machine learning model for Bitcoin price prediction with a secure web app deployed on AWS using Docker.</p>
+                <a href="https://colab.research.google.com/drive/1iEcuPgQqZv1v4MF2pwwTmogLFTLaUuD1">Link</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience" class="section">
+        <h2>Experience</h2>
+        <div class="experience-list">
+            <div class="experience-card">
+                <h3>Apprentice Cybersecurity Analyst - Allianz</h3>
+                <p>01/2025 – Present | Pune</p>
+                <p>Enhanced IAM policies and monitored cloud security logs using Splunk and Azure Sentinel.</p>
+                <!-- Replace href with actual experience letter PDF URL -->
+                <a href="https://your-url.com/allianz_letter.pdf" target="_blank"></a>
+            </div>
+            <div class="experience-card">
+                <h3>Intern Cybersecurity Analyst - Secure Sphere Foundation</h3>
+                <p>09/2024 – 12/2024 | Virtual</p>
+                <p>Analyzed security logs in Splunk and supported threat intelligence documentation.</p>
+                <!-- Replace href with actual experience letter PDF URL -->
+                <a href="Abhishek Diwate Internship Cert.pdf" target="_blank">View Experience Letter</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Education Section -->
+    <section id="education" class="section">
+        <h2>Education</h2>
+        <div class="experience-list">
+            <div class="experience-card">
+                <h3>B.Tech in Electronics & Communication</h3>
+                <p>07/2019 – 07/2023 | Sanjivani College of Engineering, Kopargaon</p>
+                <p>CGPA: 7.86</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Certifications Section -->
+    <section id="certifications" class="section">
+        <h2>Certifications</h2>
+        <div class="cert-grid">
+            <!-- Replace href with actual certification PDF URLs -->
+            <div class="cert-card"><a href="#" target="_blank">Certified Ethical Hacker (CEH)</a></div>
+            <div class="cert-card"><a href="#" target="_blank">Cloud Agent Security (Qualys)</a></div>
+            <div class="cert-card"><a href="#" target="_blank">CCNA (Cisco)</a></div>
+            <div class="cert-card"><a href="#" target="_blank">Web Application Scanning (Qualys)</a></div>
+            <div class="cert-card"><a href="#" target="_blank">VAPT (Cybervault)</a></div>
+            <div class="cert-card"><a href="#" target="_blank">AWS Certified Cloud Practitioner</a></div>
+            <div class="cert-card"><a href="#" target="_blank">Incident Handling & Threat Intelligence</a></div>
+            <div class="cert-card"><a href="#" target="_blank">The Joy of Computing using Python (NPTEL)</a></div>
+        </div>
+    </section>
+
+    <!-- Achievements Section -->
+    <section id="achievements" class="section">
+        <h2>Achievements</h2>
+        <div class="experience-list">
+            <div class="experience-card">
+                <p>Ranked in the Top 7% on TryHackMe for SOC, VAPT, and Network Security labs.</p>
+                
+				<p>Presented a research paper on Machine Learning & Cybersecurity at IEEE International Conference (Salem).</p>
+                
+				<p>Runner-up in a National-Level Project Competition (Loni) for a cybersecurity project.</p>
+               
+			   <p>Finalist in a Cybersecurity Hackathon, showcasing threat hunting and incident response skills.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Volunteer Experience Section -->
+    <section id="volunteer" class="section">
+        <h2>Volunteer Experience</h2>
+        <div class="experience-list">
+            <div class="experience-card">
+                <h3>Cybersecurity Training & Awareness Programs</h3>
+                <p>Sanjivani Polytechnic College, Kopargaon</p>
+                <p>Educated students on cyber hygiene, online threats, and best security practices. Conducted awareness sessions on
+phishing attacks, password security, and data privacy. Provided hands-on workshops on basic penetration testing
+techniques.
+</p>
+            </div>
+            <div class="experience-card">
+                <h3>Python Workshop Coordinator</h3>
+                <p>Sanjivani College of Engineering, Kopargaon</p>
+                <p>Organized and led a Python programming workshop, focusing on real-world applications and project development.
+Assisted students in developing mini-projects using Python.
+</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <h2>Contact Me</h2>
+        <form id="contact-form">
+            <input type="text" id="name" placeholder="Name" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <textarea id="message" placeholder="Message" rows="4" required></textarea>
+            <button type="submit" class="btn">Send</button>
+        </form>
+        <div class="social-links">
+            <a href="mailto:abhishekdiwate1299@gmail.com">Email</a>
+            <a href="https://www.linkedin.com/in/abhishekdiwate-1112/">LinkedIn</a>
+        </div>
+    </section>
+
+    <div class="ai-assistant" id="ai-assistant">
+        <i class="fas fa-robot"></i>
+    </div>
+    <div class="ai-panel" id="ai-panel">
+        <h3>AI Assistant</h3>
+        <p>Ask me about Abhishek’s work!</p>
+        <input type="text" id="ai-input" placeholder="Type here...">
+        <div id="ai-response"></div>
+    </div>
+
+    <script>
+        // Binary Blocks (Bidirectional Movement)
+        const binaryBlocks = document.getElementById('binary-blocks');
+        const blockDensity = 40;
+
+        function createBinaryBlock() {
+            const span = document.createElement('span');
+            let block = '';
+            for (let i = 0; i < 20; i++) {
+                block += Math.random() > 0.5 ? '1' : '0';
+            }
+            span.textContent = block;
+            const topPos = Math.random() * 100;
+            span.style.top = `${topPos}vh`;
+            const duration = 15 + Math.random() * 15;
+            span.style.animationDuration = `${duration}s`;
+            const direction = Math.random() > 0.5 ? 'right' : 'left';
+            if (direction === 'right') {
+                span.style.setProperty('--startX', `${Math.random() * 50 + 50}vw`);
+                span.style.setProperty('--endX', '-100vw');
+            } else {
+                span.style.setProperty('--startX', `${Math.random() * 50 - 50}vw`);
+                span.style.setProperty('--endX', '100vw');
+            }
+            binaryBlocks.appendChild(span);
+            setTimeout(() => span.remove(), duration * 1000);
+        }
+
+        function initBinaryBlocks() {
+            for (let i = 0; i < blockDensity; i++) {
+                createBinaryBlock();
+            }
+        }
+        initBinaryBlocks();
+        setInterval(createBinaryBlock, 600);
+
+        // Binary Rain (Reduced on Mobile)
+        const binaryRain = document.getElementById('binary-rain');
+        let binaryDensity = 150;
+
+        function createBinary() {
+            const span = document.createElement('span');
+            span.textContent = Math.random() > 0.5 ? '1' : '0';
+            const xPos = Math.random() * 100;
+            const densityFactor = xPos / 100;
+            span.style.left = `${xPos}vw`;
+            const startY = Math.random() * (-100) + 'vh';
+            span.style.setProperty('--startY', startY);
+            const duration = 3 + (1 - densityFactor) * 4;
+            span.style.animationDuration = `${duration}s`;
+            if (Math.random() < densityFactor * 2.5) {
+                binaryRain.appendChild(span);
+                setTimeout(() => span.remove(), duration * 1000);
+            }
+        }
+
+        function initBinaryRain() {
+            for (let i = 0; i < binaryDensity; i++) {
+                createBinary();
+            }
+        }
+
+        function adjustBinaryDensity() {
+            if (window.innerWidth <= 768) {
+                binaryDensity = 80;
+            } else {
+                binaryDensity = 150;
+            }
+            binaryRain.innerHTML = '';
+            initBinaryRain();
+        }
+
+        adjustBinaryDensity();
+        window.addEventListener('resize', adjustBinaryDensity);
+        window.addEventListener('load', adjustBinaryDensity);
+        setInterval(createBinary, 50);
+
+        window.addEventListener('scroll', () => {
+            binaryRain.style.transform = `translateY(-${window.scrollY * 0.3}px)`;
+        });
+
+        // Neural Network Animation (Highlighted)
+        const canvas = document.getElementById('neural-canvas');
+        const ctx = canvas.getContext('2d');
+        let nodes = [];
+        const numNodes = 80;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        class Node {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = '#66cc99';
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < numNodes; i++) {
+            nodes.push(new Node());
+        }
+
+        function animateNeural() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            nodes.forEach(node => {
+                node.update();
+                node.draw();
+            });
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const dx = nodes[i].x - nodes[j].x;
+                    const dy = nodes[i].y - nodes[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(nodes[i].x, nodes[i].y);
+                        ctx.lineTo(nodes[j].x, nodes[j].y);
+                        ctx.strokeStyle = `rgba(102, 204, 153, ${1 - dist / 120})`;
+                        ctx.lineWidth = 0.8;
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animateNeural);
+        }
+        animateNeural();
+
+        // AI Assistant
+        const aiAssistant = document.getElementById('ai-assistant');
+        const aiPanel = document.getElementById('ai-panel');
+        const aiInput = document.getElementById('ai-input');
+        const aiResponse = document.getElementById('ai-response');
+
+        aiAssistant.addEventListener('click', () => {
+            aiPanel.classList.toggle('active');
+        });
+
+        const aiResponses = {
+            'who': 'I’m Abhishek Diwate, a cybersecurity expert.',
+            'projects': 'Check out Automated Incident Response System, Threat Detector, and Bitcoin Price Prediction.',
+            'skills': 'Python, SIEM (Splunk), Threat Hunting, AWS, OSINT, and more.',
+            'experience': 'Worked with Allianz and Secure Sphere Foundation.',
+            'education': 'B.Tech in Electronics & Communication, CGPA 7.86.',
+            'achievements': 'Top 7% on TryHackMe, IEEE paper presentation, and more.',
+            'volunteer': 'Led cybersecurity training and Python workshops.',
+            'contact': 'Reach me via Email, LinkedIn, or GitHub!'
+        };
+
+        aiInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = aiInput.value.toLowerCase();
+                let response = 'Ask about my skills, projects, or experience!';
+                for (let key in aiResponses) {
+                    if (query.includes(key)) {
+                        response = aiResponses[key];
+                        break;
+                    }
+                }
+                aiResponse.textContent = response;
+                aiInput.value = '';
+            }
+        });
+
+        // Hamburger Menu Toggle with Close Button
+        const hamburger = document.getElementById('hamburger');
+        const menuToggle = document.getElementById('menu-toggle');
+        const closeBtn = document.getElementById('close-btn');
+
+        hamburger.addEventListener('click', () => {
+            menuToggle.classList.add('active');
+            hamburger.classList.add('active');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            menuToggle.classList.remove('active');
+            hamburger.classList.remove('active');
+        });
+
+        // Smooth Scrolling and Auto-Close on Mobile
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelector(anchor.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+                if (window.innerWidth <= 768) {
+                    menuToggle.classList.remove('active');
+                    hamburger.classList.remove('active');
+                }
+            });
+        });
+
+        // Contact Form Submission
+        const contactForm = document.getElementById('contact-form');
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+
+            console.log('Form Data:', { name, email, message });
+            alert('Thank you for your message! Abhishek will be notified soon.');
+
+            contactForm.reset();
+        });
+    </script>
+</body>
+</html>
